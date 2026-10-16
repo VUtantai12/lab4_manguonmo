@@ -72,3 +72,21 @@ def update_book(book_id: BookId, book: BookUpdate):
                summary="Xóa sách")
 def delete_book(book_id: BookId):
     BOOKS.remove(find_book(book_id))
+
+
+@router.post("/{book_id}/borrow", response_model=BookOut,
+             summary="Mượn sách")
+def borrow_book(book_id: BookId):
+    book = find_book(book_id)
+    if book["quantity"] <= 0:
+        raise HTTPException(status.HTTP_409_CONFLICT, "Sách đã hết")
+    book["quantity"] -= 1
+    return book
+
+
+@router.post("/{book_id}/return", response_model=BookOut,
+             summary="Trả sách")
+def return_book(book_id: BookId):
+    book = find_book(book_id)
+    book["quantity"] += 1
+    return book
